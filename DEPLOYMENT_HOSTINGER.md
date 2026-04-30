@@ -158,6 +158,27 @@ Hostinger's Git deployment builds in `.builds/source/repository/` and may not au
 
 ## Troubleshooting
 
+### 403 Forbidden or 404 Not Found Errors
+
+**1. Check if index.html exists in root:**
+- Via File Manager, verify `index.html` is directly in `public_html`
+- If not, run the post-deploy script or manually copy build files
+
+**2. Disable .htaccess temporarily to test:**
+- Rename `.htaccess` to `.htaccess-disabled` via File Manager
+- Refresh the page - if it works, the issue is in rewrite rules
+- Check the `.htaccess` file for blocking rules
+
+**3. Verify file permissions:**
+- Folders should be 755
+- Files should be 644
+- Set via File Manager > right-click > Permissions
+
+**4. Check build location:**
+- Hostinger Git deployment builds in `.builds/source/repository/`
+- The post-deploy script should copy files to root
+- Check deployment logs to see if post-deploy ran successfully
+
 ### Application won't start
 - Check Node.js version compatibility
 - Verify startup file path
