@@ -1,68 +1,64 @@
 # Deployment Guide for Hostinger Shared Hosting
 
+## Important: This is a Static SPA Deployment
+
+**Hostinger shared hosting does NOT run Node.js applications like a VPS.** This project is a Single Page Application (SPA) that should be deployed as static files.
+
+**DO NOT:**
+- Upload source code
+- Upload node_modules
+- Upload package.json/package-lock.json
+- Try to run npm install on the server
+- Configure Node.js application in hPanel
+
+**DO:**
+- Build the SPA locally
+- Upload only the built static files (HTML, CSS, JS)
+- Upload .htaccess for SPA routing
+
 ## Prerequisites
 
-- Hostinger shared hosting account with Node.js support
-- SSH access or File Manager access
-- Node.js version 22.x (check hPanel for available versions)
+- Hostinger shared hosting account (any plan)
+- File Manager access
+- Local machine with Node.js installed for building
 
-## Important Notes for Hostinger Deployment
+## Deployment Method: Build Locally + Upload Static Files
 
-Hostinger's Git deployment builds in `.builds/source/repository/` and may not automatically serve files from there. The recommended approach is to:
+### Step 1: Build the SPA Locally
 
-1. **Use the deployment script** to build and prepare files in a `public/` directory
-2. **Upload `public/` contents directly to `public_html`**
-3. **Ensure `.htaccess` is in `public_html` for SPA routing**
+```bash
+# Make the script executable (Linux/Mac)
+chmod +x deploy-hostinger.sh
 
-## Deployment Methods
+# Run the deployment script
+./deploy-hostinger.sh
+```
 
-### Method 1: Using Deployment Script + File Manager (Recommended)
+This will:
+- Install dependencies locally
+- Build the ac-booking SPA
+- Create a `public/` folder with all static files
+- Verify index.html exists
 
-1. **Build and prepare files locally:**
-   ```bash
-   chmod +x deploy-hostinger.sh
-   ./deploy-hostinger.sh
-   ```
+### Step 2: Upload to Hostinger
 
-2. **Upload to Hostinger:**
-   - Log in to Hostinger hPanel
-   - Go to File Manager
-   - Navigate to `public_html` or your subdomain folder
-   - Upload all files from the `public/` directory
-   - Upload the `.htaccess` file
+1. **Log in to Hostinger hPanel**
+2. **Go to File Manager**
+3. **Navigate to `public_html`** (or your subdomain folder)
+4. **Upload all files from the `public/` folder** to `public_html`
+5. **Upload the `.htaccess` file** to `public_html`
 
-3. **Set permissions:**
-   - Folders: 755
-   - Files: 644
-   - This can be done via File Manager > right-click > Permissions
+### Step 3: Set Permissions
 
-### Method 2: Using Git Deployment with Post-Build Script
+- Folders: 755
+- Files: 644
+- This can be done via File Manager > right-click > Permissions
 
-1. **Configure Git deployment in Hostinger:**
-   - Go to hPanel > Advanced > Git
-   - Enter your Git repository URL: `git@github.com:alexanderhfuad/acmanto-1.git`
-   - Select the branch: `main`
-   - Set the deployment folder: `public_html`
-   - Click "Create"
+### Step 4: Verify Deployment
 
-2. **Add a post-deployment script** to move build files:
-   - Create `post-deploy.sh` in your repository
-   - Hostinger will run this after git pull
-
-3. **The build will run automatically** and files will be in `.builds/source/repository/`
-
-### Method 3: Manual Build via Hostinger Node.js
-
-1. **Configure Node.js application:**
-   - Go to hPanel > Advanced > Node.js
-   - Select your Node.js version (22.x)
-   - Set the application root to your domain folder
-   - Click "Create application"
-
-2. **The system will:**
-   - Run `npm install` automatically
-   - Run the build script from `package.json`
-   - You may need to manually move build files to public_html
+- Visit your domain
+- The SPA should load
+- Check browser console for any errors
 
 ### Method 2: Using Git Deployment
 

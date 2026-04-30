@@ -1,43 +1,61 @@
 #!/bin/bash
-# Deployment script for Hostinger Shared Hosting
+# Deployment script for Hostinger Shared Hosting (Static SPA Deployment)
+# This script builds the frontend SPA locally for upload to shared hosting
 
-echo "Starting deployment for Hostinger Shared Hosting..."
-
-# Set Node.js version (Hostinger supports specific versions)
-# Check Hostinger hPanel for available Node.js versions
-export NODE_VERSION=22
+echo "Starting deployment build for Hostinger Shared Hosting..."
 
 # Clean previous build
 echo "Cleaning previous build..."
 rm -rf artifacts/ac-booking/dist/public
-rm -rf artifacts/mockup-sandbox/dist
-rm -rf node_modules/.cache
+rm -rf public
 
 # Install dependencies
 echo "Installing dependencies..."
-npm ci --production=false
+npm install
 
-# Build the application
-echo "Building application..."
+# Build only the ac-booking SPA
+echo "Building ac-booking SPA..."
+cd artifacts/ac-booking
 npm run build
+cd ../..
 
-# For production deployment, install only production dependencies
-echo "Installing production dependencies..."
-npm ci --production
+# Verify build output
+if [ ! -d "artifacts/ac-booking/dist/public" ]; then
+  echo "Error: Build failed - dist/public directory not found"
+  exit 1
+fi
 
-# Create public directory for static files
+if [ ! -f "artifacts/ac-booking/dist/public/index.html" ]; then
+  echo "Error: Build failed - index.html not found in build output"
+  exit 1
+fi
+
+# Create public directory for upload
 echo "Preparing public directory..."
 mkdir -p public
 cp -r artifacts/ac-booking/dist/public/* public/
 
-# Create index.html if it doesn't exist
-if [ ! -f public/index.html ]; then
-  echo "Warning: index.html not found in build output"
-fi
-
-echo "Deployment build complete!"
-echo "Upload the following to Hostinger public_html:"
-echo "1. public/* (all files from public directory)"
-echo "2. .htaccess file"
+echo "✓ Build completed successfully"
+echo "✓ index.html found in public directory"
 echo ""
-echo "Or use Hostinger's Git deployment with these files in root."
+echo "=========================================="
+echo "DEPLOYMENT INSTRUCTIONS"
+echo "=========================================="
+echo ""
+echo "Upload the CONTENTS of the 'public' folder to:"
+echo "  Hostinger > File Manager > public_html"
+echo ""
+echo "Files to upload:"
+ls -la public/
+echo ""
+echo "Also upload .htaccess to public_html"
+echo ""
+echo "DO NOT upload:"
+echo "  - node_modules/"
+echo "  - artifacts/"
+echo "  - lib/"
+echo "  - package.json"
+echo "  - package-lock.json"
+echo "  - source code files"
+echo ""
+echo "This is a STATIC SPA deployment - no Node.js server needed on Hostinger."
