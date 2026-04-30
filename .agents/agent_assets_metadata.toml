@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "pEHgRd4aTliJesH0rvKPr"
+uri = "file://artifacts/ac-booking/src/assets/images/hero.png"
+type = "image"
+title = "AC Technician Hero"
+
+[[generated]]
+id = "9w_buvuYHDMEKhjBhg74r"
+uri = "file://artifacts/ac-booking/src/assets/images/cuci-ac.png"
+type = "image"
+title = "AC Washing Service"
+
+[[generated]]
+id = "LdtppaO4PNl4sDjKPkrpZ"
+uri = "file://artifacts/ac-booking/src/assets/images/perbaikan-ac.png"
+type = "image"
+title = "AC Repair Service"
+
+[[generated]]
+id = "KuWxzTIRsD7o2nLk9doVR"
+uri = "file://artifacts/ac-booking/src/assets/images/pemasangan-ac.png"
+type = "image"
+title = "AC Installation Service"

@@ -1,0 +1,208 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: bookings
+    description: AC service booking operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /bookings:
+    get:
+      operationId: getBookings
+      tags: [bookings]
+      summary: List all AC service bookings
+      description: Returns all AC service bookings ordered by most recent first. Requires admin token.
+      parameters:
+        - name: x-admin-token
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Admin access token
+      responses:
+        "200":
+          description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new AC service booking
+      description: Submit a new AC service booking from the public booking form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookingRequest"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          description: Invalid booking data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /bookings/{id}/status:
+    patch:
+      operationId: updateBookingStatus
+      tags: [bookings]
+      summary: Update a booking's status
+      description: Mark a booking as pending, confirmed, completed, or cancelled. Requires admin token.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: x-admin-token
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingStatusRequest"
+      responses:
+        "200":
+          description: Updated booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        serviceType:
+          type: string
+        acType:
+          type: string
+        preferredDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - phone
+        - address
+        - serviceType
+        - acType
+        - preferredDate
+        - notes
+        - status
+        - createdAt
+    CreateBookingRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+          minLength: 8
+        address:
+          type: string
+          minLength: 5
+        serviceType:
+          type: string
+          enum: [cuci, perbaikan, pemasangan]
+        acType:
+          type: string
+        preferredDate:
+          type: string
+        notes:
+          type: ["string", "null"]
+      required:
+        - name
+        - phone
+        - address
+        - serviceType
+        - acType
+        - preferredDate
+    UpdateBookingStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, completed, cancelled]
+      required:
+        - status
