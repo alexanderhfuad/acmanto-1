@@ -15,9 +15,4 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # For SPA routing - redirect all other requests to index.html
-# Uncomment this if deploying a single-page application
-# RewriteRule ^ /index.html [L]
-
-# For API server - proxy to Node.js application
-# Uncomment and configure if deploying the API server
-# RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+RewriteRule ^ /index.html [L]

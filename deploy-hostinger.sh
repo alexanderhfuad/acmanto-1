@@ -9,7 +9,8 @@ export NODE_VERSION=22
 
 # Clean previous build
 echo "Cleaning previous build..."
-rm -rf dist
+rm -rf artifacts/ac-booking/dist/public
+rm -rf artifacts/mockup-sandbox/dist
 rm -rf node_modules/.cache
 
 # Install dependencies
@@ -24,15 +25,19 @@ npm run build
 echo "Installing production dependencies..."
 npm ci --production
 
-# Create public directory for static files if needed
-# mkdir -p public
-# cp -r dist/* public/
+# Create public directory for static files
+echo "Preparing public directory..."
+mkdir -p public
+cp -r artifacts/ac-booking/dist/public/* public/
+
+# Create index.html if it doesn't exist
+if [ ! -f public/index.html ]; then
+  echo "Warning: index.html not found in build output"
+fi
 
 echo "Deployment build complete!"
-echo "Upload the following to Hostinger:"
-echo "1. package.json"
-echo "2. package-lock.json"
-echo "3. dist/ directory"
-echo "4. node_modules/ directory (or run npm install on server)"
+echo "Upload the following to Hostinger public_html:"
+echo "1. public/* (all files from public directory)"
+echo "2. .htaccess file"
 echo ""
-echo "Alternatively, use Hostinger's Git deployment or file manager."
+echo "Or use Hostinger's Git deployment with these files in root."

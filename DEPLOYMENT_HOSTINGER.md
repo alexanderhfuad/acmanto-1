@@ -6,33 +6,63 @@
 - SSH access or File Manager access
 - Node.js version 22.x (check hPanel for available versions)
 
+## Important Notes for Hostinger Deployment
+
+Hostinger's Git deployment builds in `.builds/source/repository/` and may not automatically serve files from there. The recommended approach is to:
+
+1. **Use the deployment script** to build and prepare files in a `public/` directory
+2. **Upload `public/` contents directly to `public_html`**
+3. **Ensure `.htaccess` is in `public_html` for SPA routing**
+
 ## Deployment Methods
 
-### Method 1: Using File Manager (Recommended for simple deployments)
+### Method 1: Using Deployment Script + File Manager (Recommended)
 
-1. **Build the application locally:**
+1. **Build and prepare files locally:**
    ```bash
-   npm install
-   npm run build
+   chmod +x deploy-hostinger.sh
+   ./deploy-hostinger.sh
    ```
 
-2. **Prepare files for upload:**
-   - Upload the `dist/` folder (or `artifacts/ac-booking/dist/` for the booking app)
-   - Upload `package.json` and `package-lock.json`
-   - Upload `.htaccess` file
-
-3. **Upload to Hostinger:**
+2. **Upload to Hostinger:**
    - Log in to Hostinger hPanel
    - Go to File Manager
    - Navigate to `public_html` or your subdomain folder
-   - Upload the files
+   - Upload all files from the `public/` directory
+   - Upload the `.htaccess` file
 
-4. **Install dependencies on server:**
-   - Go to Hostinger hPanel > Advanced > Node.js
+3. **Set permissions:**
+   - Folders: 755
+   - Files: 644
+   - This can be done via File Manager > right-click > Permissions
+
+### Method 2: Using Git Deployment with Post-Build Script
+
+1. **Configure Git deployment in Hostinger:**
+   - Go to hPanel > Advanced > Git
+   - Enter your Git repository URL: `git@github.com:alexanderhfuad/acmanto-1.git`
+   - Select the branch: `main`
+   - Set the deployment folder: `public_html`
+   - Click "Create"
+
+2. **Add a post-deployment script** to move build files:
+   - Create `post-deploy.sh` in your repository
+   - Hostinger will run this after git pull
+
+3. **The build will run automatically** and files will be in `.builds/source/repository/`
+
+### Method 3: Manual Build via Hostinger Node.js
+
+1. **Configure Node.js application:**
+   - Go to hPanel > Advanced > Node.js
    - Select your Node.js version (22.x)
-   - Set the application startup file (e.g., `dist/index.mjs` for API server)
+   - Set the application root to your domain folder
    - Click "Create application"
-   - The system will automatically run `npm install`
+
+2. **The system will:**
+   - Run `npm install` automatically
+   - Run the build script from `package.json`
+   - You may need to manually move build files to public_html
 
 ### Method 2: Using Git Deployment
 
