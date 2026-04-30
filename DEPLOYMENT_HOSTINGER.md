@@ -1,64 +1,62 @@
-# Deployment Guide for Hostinger Shared Hosting
+# Deployment Guide for Hostinger
 
-## Important: This is a Static SPA Deployment
+## Deployment Methods
 
-**Hostinger shared hosting does NOT run Node.js applications like a VPS.** This project is a Single Page Application (SPA) that should be deployed as static files.
+### Method 1: Hostinger Node.js Web App (Recommended)
 
-**DO NOT:**
-- Upload source code
-- Upload node_modules
-- Upload package.json/package-lock.json
-- Try to run npm install on the server
-- Configure Node.js application in hPanel
+This method uses Hostinger's built-in Node.js Web App feature with GitHub integration.
 
-**DO:**
-- Build the SPA locally
-- Upload only the built static files (HTML, CSS, JS)
-- Upload .htaccess for SPA routing
+**Prerequisites:**
+- Hostinger account with Node.js Web App feature
+- GitHub repository with your code
 
-## Prerequisites
+**Steps:**
 
-- Hostinger shared hosting account (any plan)
-- File Manager access
-- Local machine with Node.js installed for building
+1. **Access Node.js Web App:**
+   - Log in to Hostinger hPanel
+   - Navigate to Websites on the sidebar
+   - Click Add Website
+   - Choose Node.js Apps
 
-## Deployment Method: Build Locally + Upload Static Files
+2. **Import from GitHub:**
+   - Select Import Git Repository
+   - Authorize GitHub access when prompted
+   - Select repository: `alexanderhfuad/acmanto-1`
+   - Select branch: `main`
 
-### Step 1: Build the SPA Locally
+3. **Configure Build Settings:**
+   - **Framework Type:** Vite (or "Other" if Vite not detected)
+   - **Build Command:** `npm run build:hostinger`
+   - **Output Directory:** `artifacts/ac-booking/dist/public`
+   - **Node.js Version:** 22.x
 
-```bash
-# Make the script executable (Linux/Mac)
-chmod +x deploy-hostinger.sh
+4. **Deploy:**
+   - Click Deploy
+   - Wait for build to complete
+   - Preview your website
 
-# Run the deployment script
-./deploy-hostinger.sh
-```
+**Note:** This is a static SPA deployment - no server-side Node.js process is needed.
 
-This will:
-- Install dependencies locally
-- Build the ac-booking SPA
-- Create a `public/` folder with all static files
-- Verify index.html exists
+### Method 2: Manual Static File Upload
 
-### Step 2: Upload to Hostinger
+For traditional shared hosting without Node.js Web App feature.
 
-1. **Log in to Hostinger hPanel**
-2. **Go to File Manager**
-3. **Navigate to `public_html`** (or your subdomain folder)
-4. **Upload all files from the `public/` folder** to `public_html`
-5. **Upload the `.htaccess` file** to `public_html`
+**Steps:**
 
-### Step 3: Set Permissions
+1. **Build Locally:**
+   ```bash
+   npm run build:hostinger
+   ```
 
-- Folders: 755
-- Files: 644
-- This can be done via File Manager > right-click > Permissions
+2. **Upload to Hostinger:**
+   - Go to File Manager
+   - Navigate to `public_html`
+   - Upload contents of `artifacts/ac-booking/dist/public/` to `public_html`
+   - Upload `.htaccess` to `public_html`
 
-### Step 4: Verify Deployment
-
-- Visit your domain
-- The SPA should load
-- Check browser console for any errors
+3. **Set Permissions:**
+   - Folders: 755
+   - Files: 644
 
 ### Method 2: Using Git Deployment
 
