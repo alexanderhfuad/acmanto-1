@@ -27,7 +27,7 @@ This method uses Hostinger's built-in Node.js Web App feature with GitHub integr
 3. **Configure Build Settings:**
    - **Framework Type:** Vite (or "Other" if Vite not detected)
    - **Build Command:** `npm run build:hostinger`
-   - **Output Directory:** `artifacts/ac-booking/dist/public`
+   - **Output Directory:** `.` (root directory - build script copies files to root)
    - **Node.js Version:** 22.x
 
 4. **Deploy:**
