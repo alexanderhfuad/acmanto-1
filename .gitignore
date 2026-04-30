@@ -8,6 +8,13 @@ out-tsc
 .expo
 .expo-shared
 public
+# Build output copied to root by build:hostinger script
+index.html
+favicon.svg
+opengraph.jpg
+robots.txt
+sitemap.xml
+assets/
 
 # dependencies
 node_modules
