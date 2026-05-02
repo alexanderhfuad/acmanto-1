@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { useCreateBooking } from "@workspace/api-client-react";
+import { useCreateBooking, type Booking } from "@workspace/api-client-react";
 
 const SERVICE_LABEL: Record<string, string> = {
   cuci: "Cuci AC",
@@ -73,7 +73,7 @@ export default function BookingForm() {
         },
       },
       {
-        onSuccess: (booking) => {
+        onSuccess: (booking: Booking) => {
           toast({
             title: "Booking berhasil dikirim!",
             description: `Terima kasih ${booking.name}. Tim DinginPro akan segera menghubungi Anda via WhatsApp untuk konfirmasi jadwal ${SERVICE_LABEL[booking.serviceType] ?? "layanan"}.`,
