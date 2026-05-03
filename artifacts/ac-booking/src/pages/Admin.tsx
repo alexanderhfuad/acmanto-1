@@ -13,6 +13,7 @@ import {
   Clock,
   ShieldCheck,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,8 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Booking } from "@workspace/api-client-react";
+import { Link } from "wouter";
+import { isApiEnabled } from "@/lib/deployment";
 
 const TOKEN_KEY = "dinginpro_admin_token";
 
@@ -134,6 +137,37 @@ function LoginCard({ onLogin }: { onLogin: (token: string) => void }) {
 }
 
 export default function Admin() {
+  if (!isApiEnabled) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-6">
+        <Card className="w-full max-w-xl shadow-xl">
+          <CardHeader className="space-y-3 text-center">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
+              <ShieldCheck className="w-7 h-7" />
+            </div>
+            <CardTitle className="text-2xl">Panel admin belum aktif</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Halaman admin membutuhkan backend API. Untuk sementara, frontend ini sedang berjalan dalam mode tampilan saja.
+            </p>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <Button asChild className="w-full">
+              <Link href="/">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Kembali ke Beranda
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer">
+                Hubungi via WhatsApp
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const [token, setToken] = useState<string | null>(null);
   const [authError, setAuthError] = useState(false);
   const { toast } = useToast();

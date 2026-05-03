@@ -35,6 +35,12 @@ VITE_API_BASE_URL=https://api.domainanda.com
 BASE_PATH=/
 ```
 
+Jika backend belum online dan Anda hanya ingin frontend tampil dulu, Anda boleh
+mengosongkan `VITE_API_BASE_URL`. Dalam mode ini:
+
+- form booking menampilkan status sementara dan mengarahkan user ke WhatsApp
+- halaman `/admin` menampilkan pemberitahuan bahwa backend belum aktif
+
 Lalu jalankan:
 
 ```bash

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -22,6 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { useCreateBooking, type Booking } from "@workspace/api-client-react";
+import { isApiEnabled } from "@/lib/deployment";
 
 const SERVICE_LABEL: Record<string, string> = {
   cuci: "Cuci AC",
@@ -46,6 +48,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function BookingForm() {
   const { toast } = useToast();
   const createBooking = useCreateBooking();
+  const bookingAvailable = isApiEnabled;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -60,6 +63,14 @@ export default function BookingForm() {
   });
 
   function onSubmit(values: FormValues) {
+    if (!bookingAvailable) {
+      toast({
+        title: "Booking online belum aktif",
+        description: "Untuk sementara, silakan hubungi kami lewat WhatsApp agar tim bisa membantu Anda.",
+      });
+      return;
+    }
+
     createBooking.mutate(
       {
         data: {
@@ -135,6 +146,14 @@ export default function BookingForm() {
 
           {/* Form Side */}
           <div className="p-8 md:p-12 md:w-3/5">
+            {!bookingAvailable ? (
+              <Card className="mb-6 border-amber-200 bg-amber-50 text-amber-950">
+                <CardContent className="p-5 text-sm leading-6">
+                  Form booking online sedang disiapkan untuk website ini.
+                  Sementara itu, pemesanan tetap bisa dilakukan lewat WhatsApp agar tim kami bisa merespons lebih cepat.
+                </CardContent>
+              </Card>
+            ) : null}
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -262,16 +281,36 @@ export default function BookingForm() {
                   )}
                 />
 
-                <Button type="submit" size="lg" className="w-full text-base h-12" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full text-base h-12"
+                  disabled={isSubmitting || !bookingAvailable}
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Memproses...
                     </>
+                  ) : !bookingAvailable ? (
+                    "Booking Online Segera Aktif"
                   ) : (
                     "Kirim Permintaan Booking"
                   )}
                 </Button>
+                {!bookingAvailable ? (
+                  <Button
+                    asChild
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="w-full text-base h-12"
+                  >
+                    <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer">
+                      Booking via WhatsApp
+                    </a>
+                  </Button>
+                ) : null}
               </form>
             </Form>
           </div>

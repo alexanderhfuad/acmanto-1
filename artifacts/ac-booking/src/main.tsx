@@ -1,9 +1,8 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { setBaseUrl } from "@workspace/api-client-react";
+import { apiBaseUrl } from "@/lib/deployment";
 import "./index.css";
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 
 if (apiBaseUrl) {
   setBaseUrl(apiBaseUrl);
