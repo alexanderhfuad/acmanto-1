@@ -6,7 +6,7 @@ Project ini terdiri dari:
 
 - Frontend Vite/React di `artifacts/ac-booking`
 - Backend Node/Express di `artifacts/api-server`
-- Database PostgreSQL untuk API booking
+- Database MySQL untuk API booking
 
 Artinya:
 
@@ -70,6 +70,17 @@ Lalu upload hasil `dist` ke folder subdomain/subfolder yang sesuai.
 
 Mode ini cocok jika paket Anda mendukung Node.js Web Apps.
 
+## Urutan deploy yang disarankan
+
+Untuk repo ini, deploy dalam urutan berikut:
+
+1. Deploy backend lebih dulu
+2. Salin URL backend yang diberikan Hostinger
+3. Isi `VITE_API_BASE_URL` di frontend dengan URL backend tersebut
+4. Deploy frontend
+
+Alasannya: frontend membutuhkan URL backend saat proses build.
+
 ### Frontend
 
 Tetap gunakan:
@@ -85,9 +96,13 @@ Buat file `artifacts/api-server/.env` atau isi Environment Variables di hPanel:
 
 ```env
 PORT=3000
-DATABASE_URL=postgres://user:password@host:5432/database
 ADMIN_TOKEN=token-rahasia-yang-kuat
 CORS_ORIGIN=https://domainanda.com,https://www.domainanda.com
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=user_database
+MYSQL_PASSWORD=password_database
+MYSQL_DATABASE=nama_database
 ```
 
 ### Build commands
@@ -115,6 +130,75 @@ Saran struktur domain:
 - `https://domainanda.com` untuk frontend
 - `https://api.domainanda.com` untuk backend
 
+## Setting Hostinger: backend
+
+Gunakan satu Node.js App khusus untuk backend.
+
+- `Preset framework`: `Other`
+- `Branch`: `main`
+- `Node version`: `22.x`
+- `Root directory`: `./`
+- `Build command`: `npm run build:api`
+- `Package manager`: `npm`
+- `Output directory`: kosongkan
+- `Entry file`: `artifacts/api-server/dist/index.mjs`
+
+Environment Variables:
+
+- `ADMIN_TOKEN`: token admin yang kuat
+- `CORS_ORIGIN`: `https://domain-frontend-anda.com,https://www.domain-frontend-anda.com`
+- `MYSQL_HOST`: host MySQL dari hPanel, sering kali `localhost`
+- `MYSQL_PORT`: `3306`
+- `MYSQL_USER`: username database MySQL
+- `MYSQL_PASSWORD`: password database MySQL
+- `MYSQL_DATABASE`: nama database MySQL
+
+Catatan:
+
+- Repo ini adalah monorepo workspace, jadi `Root directory` backend harus `./`, bukan `artifacts/api-server`
+- Jika `Root directory` diisi `artifacts/api-server`, dependency workspace internal tidak akan terpasang dengan benar
+- Backend akan membuat tabel `bookings` otomatis saat startup jika belum ada
+
+## Setting Hostinger: frontend
+
+Gunakan Node.js App kedua khusus untuk frontend.
+
+- `Preset framework`: `Other`
+- `Branch`: `main`
+- `Node version`: `22.x`
+- `Root directory`: `./`
+- `Build command`: `npm run build:frontend`
+- `Package manager`: `npm`
+- `Output directory`: `artifacts/ac-booking/dist`
+- `Entry file`: kosongkan
+
+Environment Variables:
+
+- `BASE_PATH`: `/`
+- `VITE_API_BASE_URL`: URL backend dari app backend Hostinger Anda
+
+Contoh:
+
+- `VITE_API_BASE_URL=https://api.domainanda.com`
+
+Catatan:
+
+- `Root directory` frontend juga harus `./` karena frontend memakai package workspace internal `@workspace/api-client-react`
+- `Output directory` mengarah ke folder hasil build Vite di dalam monorepo
+- `Entry file` tidak perlu diisi karena frontend ini dibuild sebagai static output
+
+## Jika memakai domain dan subdomain
+
+Contoh mapping yang disarankan:
+
+- Frontend: `https://dinginpro.com`
+- Backend: `https://api.dinginpro.com`
+
+Maka:
+
+- `VITE_API_BASE_URL=https://api.dinginpro.com`
+- `CORS_ORIGIN=https://dinginpro.com,https://www.dinginpro.com`
+
 ## Perubahan yang sudah dibuat
 
 - Frontend sekarang mendukung `VITE_API_BASE_URL` untuk API lintas domain/subdomain
@@ -126,7 +210,6 @@ Saran struktur domain:
 
 ## Yang tetap wajib Anda siapkan
 
-- Database PostgreSQL yang aktif
-- Nilai `DATABASE_URL`
+- Database MySQL yang aktif
 - `ADMIN_TOKEN` untuk halaman admin
 - Hosting yang memang mendukung Node.js jika API ingin dijalankan di Hostinger

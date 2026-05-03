@@ -6,6 +6,8 @@
     "build": "npm run typecheck && npm run build --workspaces --if-present",
     "build:frontend": "npm run build --workspace @workspace/ac-booking",
     "build:api": "npm run build --workspace @workspace/api-server",
+    "hostinger:frontend": "npm run build:frontend",
+    "hostinger:api": "npm run build:api",
     "dev": "cd artifacts/ac-booking && npm run dev",
     "deploy:hostinger:frontend": "npm run build:frontend",
     "typecheck:libs": "tsc --build",

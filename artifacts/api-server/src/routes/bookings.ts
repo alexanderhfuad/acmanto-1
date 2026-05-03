@@ -9,6 +9,17 @@ import {
 
 const router: IRouter = Router();
 
+function toIsoString(value: Date | string): string {
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+}
+
+function serializeBooking<T extends { createdAt: Date | string }>(booking: T) {
+  return {
+    ...booking,
+    createdAt: toIsoString(booking.createdAt),
+  };
+}
+
 function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   const expected = process.env["ADMIN_TOKEN"];
   const provided = req.header("x-admin-token");
@@ -25,10 +36,7 @@ router.get("/bookings", requireAdmin, async (req, res) => {
       .select()
       .from(bookingsTable)
       .orderBy(desc(bookingsTable.createdAt));
-    const data = rows.map((r: typeof rows[number]) => ({
-      ...r,
-      createdAt: r.createdAt.toISOString(),
-    }));
+    const data = rows.map((r: typeof rows[number]) => serializeBooking(r));
     res.json(data);
   } catch (err) {
     req.log.error({ err }, "Failed to list bookings");
@@ -43,7 +51,7 @@ router.post("/bookings", async (req, res) => {
     return;
   }
   try {
-    const [created] = await db
+    const result = await db
       .insert(bookingsTable)
       .values({
         name: parsed.data.name,
@@ -53,16 +61,18 @@ router.post("/bookings", async (req, res) => {
         acType: parsed.data.acType,
         preferredDate: parsed.data.preferredDate,
         notes: parsed.data.notes ?? null,
-      })
-      .returning();
+      });
+    const insertId = Number(result[0].insertId);
+    const [created] = await db
+      .select()
+      .from(bookingsTable)
+      .where(eq(bookingsTable.id, insertId))
+      .limit(1);
     if (!created) {
       res.status(500).json({ error: "Gagal menyimpan booking" });
       return;
     }
-    res.status(201).json({
-      ...created,
-      createdAt: created.createdAt.toISOString(),
-    });
+    res.status(201).json(serializeBooking(created));
   } catch (err) {
     req.log.error({ err }, "Failed to create booking");
     res.status(500).json({ error: "Gagal menyimpan booking" });
@@ -81,19 +91,20 @@ router.patch("/bookings/:id/status", requireAdmin, async (req, res) => {
     return;
   }
   try {
-    const [updated] = await db
+    await db
       .update(bookingsTable)
       .set({ status: body.data.status })
+      .where(eq(bookingsTable.id, params.data.id));
+    const [updated] = await db
+      .select()
+      .from(bookingsTable)
       .where(eq(bookingsTable.id, params.data.id))
-      .returning();
+      .limit(1);
     if (!updated) {
       res.status(404).json({ error: "Booking tidak ditemukan" });
       return;
     }
-    res.json({
-      ...updated,
-      createdAt: updated.createdAt.toISOString(),
-    });
+    res.json(serializeBooking(updated));
   } catch (err) {
     req.log.error({ err }, "Failed to update booking status");
     res.status(500).json({ error: "Gagal memperbarui status booking" });
