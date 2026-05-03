@@ -4,7 +4,10 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run typecheck && npm run build --workspaces --if-present",
+    "build:frontend": "npm run build --workspace @workspace/ac-booking",
+    "build:api": "npm run build --workspace @workspace/api-server",
     "dev": "cd artifacts/ac-booking && npm run dev",
+    "deploy:hostinger:frontend": "npm run build:frontend",
     "typecheck:libs": "tsc --build",
     "typecheck": "npm run typecheck:libs && npm run typecheck --workspaces --if-present"
   },

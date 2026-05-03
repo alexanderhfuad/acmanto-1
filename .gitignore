@@ -8,6 +8,8 @@ out-tsc
 .expo
 .expo-shared
 public
+!artifacts/ac-booking/public/
+!artifacts/ac-booking/public/.htaccess
 # Build output copied to root by build:hostinger script
 index.html
 favicon.svg

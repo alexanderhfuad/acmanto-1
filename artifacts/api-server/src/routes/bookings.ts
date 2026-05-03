@@ -25,7 +25,7 @@ router.get("/bookings", requireAdmin, async (req, res) => {
       .select()
       .from(bookingsTable)
       .orderBy(desc(bookingsTable.createdAt));
-    const data = rows.map((r) => ({
+    const data = rows.map((r: typeof rows[number]) => ({
       ...r,
       createdAt: r.createdAt.toISOString(),
     }));

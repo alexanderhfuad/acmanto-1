@@ -12,6 +12,8 @@ if (rawPort && (Number.isNaN(port) || port <= 0)) {
 }
 
 const basePath = process.env.BASE_PATH || "/";
+const buildOutDir =
+  process.env.BUILD_OUT_DIR || path.resolve(import.meta.dirname, "dist");
 
 export default defineConfig({
   base: basePath,
@@ -42,7 +44,7 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: buildOutDir,
     emptyOutDir: true,
   },
   server: {
